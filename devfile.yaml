@@ -2,7 +2,7 @@ schemaVersion: 2.3.0
 metadata:
   name: workspace-frontend
   displayName: Frontend Development
-  description: A development environment for frontend projects with auto-cloned repository
+  description: A Node.js development environment with Git repo preloaded and VS Code run/debug support
 
 projects:
   - name: workspace-frontend
@@ -15,10 +15,15 @@ components:
     container:
       image: cgr.dev/chainguard/node:latest-dev@sha256:0d9c52de8b469d6b5a9ba602843b37f04e4a70b0256463acc70148936197cfec
       mountSources: true
+      memoryRequest: 1Gi
+      memoryLimit: 2Gi
       endpoints:
         - exposure: public
           name: http-3000
           targetPort: 3000
+        - exposure: public
+          name: node-debug-9229
+          targetPort: 9229
 
 commands:
   - id: install
@@ -37,5 +42,18 @@ commands:
       workingDir: /projects/workspace-frontend
       commandLine: npm run dev --if-present || npm start --if-present || tail -f /dev/null
       group:
+        isDefault: true
+        kind: run
+  - id: debug
+    exec:
+      label: Run Node.js in debug mode
+      component: runtime
+      workingDir: /projects/workspace-frontend
+      commandLine: npm run debug --if-present || node --inspect=0.0.0.0:9229 index.js
+      group:
         isDefault: false
         kind: run
+
+events:
+  postStart:
+    - install
