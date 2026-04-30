@@ -1,0 +1,34 @@
+schemaVersion: 2.3.0
+metadata:
+  name: workspace-frontend
+  displayName: Frontend Development
+  description: A development environment for frontend projects with auto-cloned repository
+components:
+  - name: runtime
+    container:
+      image: node:18-alpine
+      endpoints:
+        - exposure: public
+          name: http-3000
+          targetPort: 3000
+
+commands:
+  - id: install
+    exec:
+      label: Install dependencies
+      component: runtime
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: npm install
+      group:
+        isDefault: true
+        kind: build
+  - id: run
+    exec:
+      label: Run development server
+      component: runtime
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: npm start
+      group:
+        isDefault: true
+        kind: run
+
