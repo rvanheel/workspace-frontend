@@ -3,10 +3,18 @@ metadata:
   name: workspace-frontend
   displayName: Frontend Development
   description: A development environment for frontend projects with auto-cloned repository
+
+projects:
+  - name: workspace-frontend
+    git:
+      remotes:
+        origin: https://ghes.tooling.mkcs.lab/MKCS/workspace-frontend.git
+
 components:
   - name: runtime
     container:
       image: cgr.dev/chainguard/node:latest-dev@sha256:0d9c52de8b469d6b5a9ba602843b37f04e4a70b0256463acc70148936197cfec
+      mountSources: true
       endpoints:
         - exposure: public
           name: http-3000
@@ -17,8 +25,8 @@ commands:
     exec:
       label: Install dependencies
       component: runtime
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: npm install
+      workingDir: /projects/workspace-frontend
+      commandLine: if [ -f package-lock.json ]; then npm ci; else npm install; fi
       group:
         isDefault: true
         kind: build
@@ -26,9 +34,8 @@ commands:
     exec:
       label: Run development server
       component: runtime
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: npm start
+      workingDir: /projects/workspace-frontend
+      commandLine: npm run dev --if-present || npm start --if-present || tail -f /dev/null
       group:
-        isDefault: true
+        isDefault: false
         kind: run
-
