@@ -1,4 +1,6 @@
 schemaVersion: 2.3.0
+attributes:
+  controller.devfile.io/storage-type: per-workspace
 metadata:
   name: workspace-frontend
   displayName: Frontend Development
@@ -7,6 +9,9 @@ metadata:
 projects:
   - name: workspace-frontend
     git:
+      checkoutFrom:
+        remote: origin
+        revision: main
       remotes:
         origin: https://github.com/rvanheel/workspace-frontend.git
 
@@ -14,49 +19,65 @@ components:
   - name: runtime
     container:
       image: docker.io/library/node:latest
-      mountSources: true
       memoryRequest: 1Gi
       memoryLimit: 2Gi
+      cpuRequest: 500m
+      cpuLimit: 1000m
+      mountSources: true
+      sourceMapping: /projects
+      env:
+        - name: NODE_ENV
+          value: development
+        - name: VSCODE_DEFAULT_WORKSPACE
+          value: /projects/workspace-frontend/workspace-frontend.code-workspace
+      volumeMounts:
+        - name: npm
+          path: /home/user/.npm
       command:
         - sleep
         - infinity
       endpoints:
-        - exposure: public
-          name: http-3000
+        - name: http-3000
           targetPort: 3000
-        - exposure: public
-          name: node-debug-9229
+          exposure: public      
+        - name: node-debug-9229
           targetPort: 9229
+          exposure: public
+  - volume:
+      size: 1Gi
+    name: projects
+  - volume:
+      size: 2Gi
+    name: npm
+
+commands:
+  - exec:
+      commandLine: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      component: runtime
+      group:
+        isDefault: true
+        kind: build
+      workingDir: '/projects/workspace-frontend'
+    id: install    
+  - exec:
+      commandLine: npm run dev --if-present || npm start --if-present || tail -f /dev/null
+      component: runtime
+      group:
+        isDefault: true
+        kind: run
+      label: Run development server
+      workingDir: '/projects/workspace-frontend'
+    id: run    
+  - exec:
+      commandLine: npm run debug --if-present || node --inspect=0.0.0.0:9229 index.js
+      component: runtime
+      group:
+        isDefault: false
+        kind: run
+      label: Run Node.js in debug mode
+      workingDir: '/projects/workspace-frontend'
+    id: debug
 
 events:
   postStart:
     - install
-
-commands:
-  - id: install
-    exec:
-      label: Install dependencies
-      component: runtime
-      workingDir: /projects/workspace-frontend
-      commandLine: if [ -f package-lock.json ]; then npm ci; else npm install; fi
-      group:
-        isDefault: true
-        kind: build
-  - id: run
-    exec:
-      label: Run development server
-      component: runtime
-      workingDir: /projects/workspace-frontend
-      commandLine: npm run dev --if-present || npm start --if-present || tail -f /dev/null
-      group:
-        isDefault: true
-        kind: run
-  - id: debug
-    exec:
-      label: Run Node.js in debug mode
-      component: runtime
-      workingDir: /projects/workspace-frontend
-      commandLine: npm run debug --if-present || node --inspect=0.0.0.0:9229 index.js
-      group:
-        isDefault: false
-        kind: run
