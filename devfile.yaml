@@ -8,7 +8,7 @@ projects:
   - name: workspace-frontend
     git:
       remotes:
-        origin: https://ghes.tooling.mkcs.lab/MKCS/workspace-frontend.git
+        origin: https://github.com/rvanheel/workspace-frontend.git
 
 components:
   - name: runtime
