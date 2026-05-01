@@ -13,7 +13,7 @@ projects:
 components:
   - name: runtime
     container:
-      image: cgr.dev/chainguard/node:latest-dev@sha256:0d9c52de8b469d6b5a9ba602843b37f04e4a70b0256463acc70148936197cfec
+      image: docker.io/library/node:latest
       mountSources: true
       memoryRequest: 1Gi
       memoryLimit: 2Gi
