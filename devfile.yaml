@@ -30,9 +30,6 @@ components:
           value: development
         - name: VSCODE_DEFAULT_WORKSPACE
           value: /projects/workspace-frontend/workspace-frontend.code-workspace
-      volumeMounts:
-        - name: npm
-          path: /home/user/.npm
       command:
         - sleep
         - infinity
@@ -46,9 +43,6 @@ components:
   - volume:
       size: 1Gi
     name: projects
-  - volume:
-      size: 2Gi
-    name: npm
 
 commands:
   - exec:
