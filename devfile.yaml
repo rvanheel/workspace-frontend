@@ -28,11 +28,15 @@ components:
       env:
         - name: NODE_ENV
           value: development
+        - name: HOME
+          value: /tmp/home
+        - name: NPM_CONFIG_CACHE
+          value: /tmp/.npm
         - name: VSCODE_DEFAULT_WORKSPACE
           value: /projects/workspace-frontend/workspace-frontend.code-workspace
       volumeMounts:
         - name: npm
-          path: /home/user/.npm
+          path: /tmp/.npm
       command:
         - sleep
         - infinity
@@ -52,7 +56,7 @@ components:
 
 commands:
   - exec:
-      commandLine: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      commandLine: mkdir -p /tmp/home /tmp/.npm && if [ -f package-lock.json ]; then npm ci; else npm install; fi
       component: runtime
       group:
         isDefault: true
