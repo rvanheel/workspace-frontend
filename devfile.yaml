@@ -17,6 +17,9 @@ components:
       mountSources: true
       memoryRequest: 1Gi
       memoryLimit: 2Gi
+      command:
+        - sleep
+        - infinity
       endpoints:
         - exposure: public
           name: http-3000
