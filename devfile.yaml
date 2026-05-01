@@ -28,6 +28,10 @@ components:
           name: node-debug-9229
           targetPort: 9229
 
+events:
+  postStart:
+    - install
+
 commands:
   - id: install
     exec:
