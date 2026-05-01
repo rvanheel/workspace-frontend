@@ -77,7 +77,3 @@ commands:
       label: Run Node.js in debug mode
       workingDir: '/projects/workspace-frontend'
     id: debug
-
-events:
-  postStart:
-    - install
